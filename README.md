@@ -2,8 +2,13 @@
 
 AI-powered fake news & misinformation detector for India with multi-language support (Hindi / English / Hinglish).
 
+**🔗 Live Demo:** https://sachai-m0p6.onrender.com
+**📂 GitHub:** https://github.com/Rev-ImranKhan/sachai
+
 ## Stack
 - FastAPI + SQLite
+- Groq API
+- Tavily API
 - Google Gemini (`gemini-2.0-flash`) via `google-genai`
 - LangChain + ChromaDB (RAG over verified facts)
 - JWT + bcrypt auth
