@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block body %}
+<section class="section container">
+  <div class="between mb">
+    <h2><i class="fa-solid fa-users"></i> Community Reports</h2>
+    {% if user %}<button class="btn btn-primary" onclick="document.getElementById('newrep').scrollIntoView({behavior:'smooth'})">Submit a Claim</button>{% endif %}
+  </div>
+
+  <div class="grid grid-2">
+    <div>
+      {% for r in reports %}
+        <div class="card mb">
+          <div class="meta">{{ r.reporter }} · {{ r.created_at }}</div>
+          <p class="mt">{{ r.claim_text }}</p>
+          <div class="between mt">
+            <span class="verdict-pill verdict-{{ (r.ai_verdict or 'UNVERIFIABLE').split(' ')[0] }}">AI: {{ r.ai_verdict or 'PENDING' }}</span>
+            <div class="flex">
+              <button class="btn btn-outline" onclick="vote({{ r.id }},'up',this)"><i class="fa-solid fa-arrow-up"></i> <span>{{ r.upvotes }}</span></button>
+              <button class="btn btn-outline" onclick="vote({{ r.id }},'down',this)"><i class="fa-solid fa-arrow-down"></i> <span>{{ r.downvotes }}</span></button>
+            </div>
+          </div>
+        </div>
+      {% else %}<p class="muted">No community reports yet.</p>{% endfor %}
+    </div>
+
+    <div>
+      <div class="card">
+        <h3><i class="fa-solid fa-trophy"></i> Top Fact-Checkers</h3>
+        <ol style="padding-left:24px;margin-top:10px">
+          {% for l in leaders %}<li style="padding:6px 0"><strong>{{ l.name }}</strong> <span class="muted">— {{ l.checks_count }} checks</span></li>{% endfor %}
+        </ol>
+      </div>
+
+      {% if user %}
+      <div class="card mt" id="newrep">
+        <h3>Report a Suspicious Claim</h3>
+        <textarea id="claim" rows="4" class="field" placeholder="Paste the suspicious claim or forward..." style="width:100%"></textarea>
+        <button class="btn btn-primary mt" onclick="submitReport()"><i class="fa-solid fa-paper-plane"></i> Submit & Get AI Verdict</button>
+        <div id="repOut"></div>
+      </div>
+      {% else %}
+      <div class="card mt center"><p class="muted">Login to submit reports & vote.</p><a href="/login" class="btn btn-primary mt">Login</a></div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<script>
+async function vote(id,dir,btn){
+  try{
+    const out = await postJSON('/api/community/'+id+'/vote',{dir});
+    const span = btn.querySelector('span'); span.textContent = dir==='up'?out.upvotes:out.downvotes;
+  }catch(e){alert('Login required to vote.');}
+}
+async function submitReport(){
+  const claim = document.getElementById('claim').value.trim();
+  if(!claim) return;
+  const out = await postJSON('/api/community',{claim});
+  document.getElementById('repOut').innerHTML = '<div class="evidence for mt">Submitted! AI verdict: <strong>'+out.verdict+'</strong></div>';
+  setTimeout(()=>location.reload(),1200);
+}
+</script>
+{% endblock %}

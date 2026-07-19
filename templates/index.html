@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block body %}
+<section class="hero">
+  <div class="container">
+    <h1>Sach Jaano, <span>Sach Failao</span> — SachAI</h1>
+    <p class="lede">India's AI-powered shield against fake news and WhatsApp misinformation. Verify claims in Hindi, English & Hinglish — instantly.</p>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+      <a href="/register" class="btn btn-primary"><i class="fa-solid fa-rocket"></i> Start Verifying</a>
+      <a href="/trending" class="btn btn-outline"><i class="fa-solid fa-fire"></i> See Trending Hoaxes</a>
+    </div>
+
+    <div class="hero-stats">
+      <div class="stat"><div class="num" id="cnt1">0</div><div class="lbl">Claims Verified Today</div></div>
+      <div class="stat"><div class="num" id="cnt2">0</div><div class="lbl">Hoaxes Debunked</div></div>
+      <div class="stat"><div class="num" id="cnt3">0</div><div class="lbl">Languages Supported</div></div>
+    </div>
+
+    <div class="shock"><i class="fa-solid fa-circle-exclamation"></i> <strong>India is the world's #1 source of WhatsApp misinformation.</strong> Every share matters — verify before you forward.</div>
+  </div>
+</section>
+
+<section class="section container">
+  <h2>How SachAI Works</h2>
+  <div class="steps">
+    <div class="step"><div class="icon"><i class="fa-solid fa-keyboard"></i></div><h3>1. Paste the Claim</h3><p class="muted">Text, news URL, or a WhatsApp forward — paste it in.</p></div>
+    <div class="step"><div class="icon"><i class="fa-solid fa-brain"></i></div><h3>2. AI + RAG Analysis</h3><p class="muted">Gemini cross-checks against our verified facts database (ChromaDB).</p></div>
+    <div class="step"><div class="icon"><i class="fa-solid fa-circle-check"></i></div><h3>3. Get a Verdict</h3><p class="muted">Confidence-scored verdict with evidence, context & spread risk.</p></div>
+  </div>
+</section>
+
+<section class="section container">
+  <h2>Recent Verdicts</h2>
+  <div class="grid grid-3">
+    <div class="card" style="position:relative"><div class="stamp debunked">FALSE</div><h3>5G towers spread COVID-19</h3><p class="muted">Viruses cannot travel on radio waves. Confirmed by WHO & DoT India.</p></div>
+    <div class="card" style="position:relative"><div class="stamp verified">TRUE</div><h3>PM Kisan: Rs 6000/yr to farmers</h3><p class="muted">Direct benefit transfer scheme — three Rs 2000 installments per year.</p></div>
+    <div class="card" style="position:relative"><div class="stamp debunked">FALSE</div><h3>Free recharge from PM scheme</h3><p class="muted">Phishing scam. No telecom or government scheme exists.</p></div>
+  </div>
+</section>
+
+<section class="section container center">
+  <h2>Trusted Approach</h2>
+  <div class="badges">
+    <div><i class="fa-solid fa-lock"></i> Encrypted & private</div>
+    <div><i class="fa-solid fa-flag"></i> Made for India</div>
+    <div><i class="fa-solid fa-database"></i> 30+ verified facts (RAG)</div>
+    <div><i class="fa-solid fa-language"></i> Hindi · English · Hinglish</div>
+  </div>
+</section>
+
+<script>
+  animatedCounter(document.getElementById('cnt1'), 12486 + Math.floor(Math.random()*900));
+  animatedCounter(document.getElementById('cnt2'), 8421 + Math.floor(Math.random()*400));
+  animatedCounter(document.getElementById('cnt3'), 3);
+</script>
+{% endblock %}

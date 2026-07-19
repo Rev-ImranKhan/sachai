@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block body %}
+<section class="section container">
+  <h2>Your Check History</h2>
+  <div class="toolbar">
+    <input id="search" class="field" style="flex:1;min-width:240px" placeholder="Search claims..."/>
+    <select id="vfilter" class="field">
+      <option value="">All verdicts</option>
+      <option>TRUE</option><option>FALSE</option><option>MISLEADING</option>
+      <option>PARTIALLY TRUE</option><option>UNVERIFIABLE</option>
+    </select>
+    <input id="dfilter" type="date" class="field"/>
+  </div>
+
+  <table class="table">
+    <thead><tr><th>Date</th><th>Type</th><th>Claim</th><th>Verdict</th><th>Conf.</th><th></th></tr></thead>
+    <tbody id="rows">
+    {% for c in checks %}
+      <tr data-verdict="{{ c.verdict }}" data-date="{{ c.created_at[:10] }}" data-text="{{ c.input_text|lower }}">
+        <td>{{ c.created_at }}</td>
+        <td><span class="verdict-pill" style="background:var(--surface);color:var(--muted);border:1px solid var(--border)">{{ c.input_type }}</span></td>
+        <td><a href="/result/{{ c.id }}" style="color:var(--text)">{{ c.input_text[:90] }}{% if c.input_text|length > 90 %}…{% endif %}</a></td>
+        <td><span class="verdict-pill verdict-{{ c.verdict.split(' ')[0] }}">{{ c.verdict }}</span></td>
+        <td>{{ c.confidence }}%</td>
+        <td><button class="btn btn-danger" style="padding:4px 10px" onclick="del({{ c.id }}, this)"><i class="fa-solid fa-trash"></i></button></td>
+      </tr>
+    {% else %}
+      <tr><td colspan="6" class="center muted" style="padding:40px">No checks yet. <a href="/fact-check">Start one →</a></td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</section>
+<script>
+function filter(){
+  const q=document.getElementById('search').value.toLowerCase();
+  const v=document.getElementById('vfilter').value;
+  const d=document.getElementById('dfilter').value;
+  document.querySelectorAll('#rows tr').forEach(r=>{
+    if(!r.dataset.verdict){return;}
+    const ok=(!q||r.dataset.text.includes(q))&&(!v||r.dataset.verdict===v)&&(!d||r.dataset.date===d);
+    r.style.display=ok?'':'none';
+  });
+}
+['search','vfilter','dfilter'].forEach(id=>document.getElementById(id).addEventListener('input',filter));
+async function del(id,btn){if(!confirm('Delete this check?'))return; await delJSON('/api/check/'+id); btn.closest('tr').remove();}
+</script>
+{% endblock %}

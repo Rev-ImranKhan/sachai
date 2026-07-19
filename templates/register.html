@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block body %}
+<div class="auth-wrap">
+  <div class="auth-split">
+    <div class="auth-brand">
+      <div class="mark"><i class="fa-solid fa-shield-halved"></i> SachAI</div>
+      <p>Join thousands checking viral claims before sharing them forward.</p>
+      <ul>
+        <li><i class="fa-solid fa-circle-check"></i> Instant AI verdicts</li>
+        <li><i class="fa-solid fa-circle-check"></i> Community fact-check reports</li>
+        <li><i class="fa-solid fa-circle-check"></i> Full history, always saved</li>
+      </ul>
+    </div>
+    <div class="auth-form-panel">
+      <form method="post" action="/api/register">
+        <h2><i class="fa-solid fa-user-plus"></i> Create your account</h2>
+        <p class="sub">Free forever, takes 30 seconds</p>
+        {% if error %}<div class="error">{{ error }}</div>{% endif %}
+        <div class="field">
+          <label>Name</label>
+          <div class="input-icon"><i class="fa-solid fa-user"></i><input name="name" required autocomplete="name"/></div>
+        </div>
+        <div class="field">
+          <label>Email</label>
+          <div class="input-icon"><i class="fa-solid fa-envelope"></i><input name="email" type="email" required autocomplete="email"/></div>
+        </div>
+        <div class="field">
+          <label>Password</label>
+          <div class="input-icon" style="position:relative">
+            <i class="fa-solid fa-lock"></i>
+            <input id="pw2" name="password" type="password" minlength="6" required autocomplete="new-password" style="padding-right:38px"/>
+            <button type="button" class="pw-toggle" onclick="const p=document.getElementById('pw2');const i=this.querySelector('i');if(p.type==='password'){p.type='text';i.className='fa-solid fa-eye-slash'}else{p.type='password';i.className='fa-solid fa-eye'}"><i class="fa-solid fa-eye"></i></button>
+          </div>
+          <p class="muted" style="font-size:12px;margin-top:4px">At least 6 characters</p>
+        </div>
+        <div class="field">
+          <label>Preferred language</label>
+          <select name="language">
+            <option value="Both" selected>Both (Hindi + English)</option>
+            <option value="Hindi">Hindi</option>
+            <option value="English">English</option>
+          </select>
+        </div>
+        <button class="btn btn-primary btn-block">Create account</button>
+        <p class="center muted mt">Already have one? <a href="/login">Sign in</a></p>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

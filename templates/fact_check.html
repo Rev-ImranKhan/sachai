@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block body %}
+<section class="section container">
+  <h2><i class="fa-solid fa-magnifying-glass"></i> Fact Checker</h2>
+  <p class="muted mb">Paste a claim, news URL, or WhatsApp forward. SachAI will analyze it using RAG + Gemini.</p>
+
+  <div class="tabs" id="tabs">
+    <button class="active" data-type="text"><i class="fa-solid fa-keyboard"></i> Text</button>
+    <button data-type="url"><i class="fa-solid fa-link"></i> URL</button>
+    <button data-type="whatsapp"><i class="fa-brands fa-whatsapp"></i> WhatsApp Forward</button>
+  </div>
+
+  <div class="card">
+    <div class="field">
+      <label id="lbl">Claim text</label>
+      <textarea id="input" rows="6" placeholder="e.g. Drinking hot water cures coronavirus"></textarea>
+    </div>
+    <div class="progress" id="progressWrap" style="display:none"><div class="progress-bar" id="bar"></div></div>
+    <button class="btn btn-primary" id="go"><i class="fa-solid fa-bolt"></i> Analyze with AI</button>
+  </div>
+
+  <div id="result" class="mt"></div>
+</section>
+
+<script>
+let currentType = 'text';
+const tabs = document.getElementById('tabs');
+tabs.addEventListener('click', e=>{
+  const b = e.target.closest('button'); if(!b) return;
+  setActive(tabs,b);
+  currentType = b.dataset.type;
+  const lbl = document.getElementById('lbl');
+  const inp = document.getElementById('input');
+  if(currentType==='url'){lbl.textContent='News article URL';inp.placeholder='https://...';}
+  else if(currentType==='whatsapp'){lbl.textContent='Paste WhatsApp forward';inp.placeholder='Forwarded as received...';}
+  else {lbl.textContent='Claim text';inp.placeholder='e.g. Drinking hot water cures coronavirus';}
+});
+
+document.getElementById('go').addEventListener('click', async ()=>{
+  const text = document.getElementById('input').value.trim();
+  if(!text){alert('Please enter something to check.');return;}
+  const wrap = document.getElementById('progressWrap');
+  const bar = document.getElementById('bar');
+  wrap.style.display='block'; bar.style.width='10%';
+  let p=10; const t=setInterval(()=>{p=Math.min(90,p+8); bar.style.width=p+'%';},250);
+  document.getElementById('result').innerHTML='';
+  try{
+    const out = await postJSON('/api/check',{text,type:currentType});
+    clearInterval(t); bar.style.width='100%';
+    setTimeout(()=>{wrap.style.display='none';bar.style.width='0';},400);
+    renderResult(out);
+  }catch(err){
+    clearInterval(t); wrap.style.display='none';
+    document.getElementById('result').innerHTML='<div class="error">'+err.message+'</div>';
+  }
+});
+
+function renderResult(out){
+  const a = out.analysis;
+  const cls = verdictClass(a.verdict);
+  const risk = (a.spread_risk||'Medium').toLowerCase();
+  const warn = risk==='high' ? '<div class="warn-banner"><i class="fa-solid fa-triangle-exclamation"></i> <strong>HIGH SPREAD RISK</strong> — this type of claim goes viral fast. Do not forward without verifying.</div>' : '';
+  const evFor = (a.evidence_for||[]).map(x=>`<div class="evidence for">${x}</div>`).join('') || '<p class="muted">None found.</p>';
+  const evAg = (a.evidence_against||[]).map(x=>`<div class="evidence against">${x}</div>`).join('') || '<p class="muted">None found.</p>';
+  const sources = (a.sources_consulted||[]).map(s=>`<span class="verdict-pill" style="background:var(--surface);color:var(--muted);border:1px solid var(--border)">${s}</span>`).join(' ');
+  const webSources = (a.web_sources||[]).map(w=>`<div class="source-item"><i class="fa-solid fa-link"></i><a href="${w.url}" target="_blank" rel="noopener">${w.title}</a><span class="domain">${w.domain}</span></div>`).join('');
+  const webSourcesBlock = webSources ? `<h3 class="mt">Live web sources</h3><div class="source-list">${webSources}</div>` : '';
+
+  document.getElementById('result').innerHTML = `
+    ${warn}
+    <div class="card" style="position:relative">
+      <span class="stamp ${a.verdict==='TRUE'?'verified':'debunked'}">${a.verdict}</span>
+      <div class="meta">Verdict</div>
+      <span class="verdict-badge ${cls}">${a.verdict}</span>
+      <div class="arc-wrap">
+        <svg id="arc" width="180" height="180" viewBox="0 0 180 180">
+          <circle class="arc-bg" cx="90" cy="90" r="70"/>
+          <circle class="arc-fg" cx="90" cy="90" r="70"/>
+        </svg>
+        <div class="arc-label">${a.confidence}%</div>
+        <div class="arc-sub">Confidence</div>
+      </div>
+      <h3>Summary</h3><p>${a.summary}</p>
+      <div class="grid grid-2 mt">
+        <div><h3 style="color:var(--true)">Evidence For</h3>${evFor}</div>
+        <div><h3 style="color:var(--false)">Evidence Against</h3>${evAg}</div>
+      </div>
+      <h3 class="mt">Context</h3><p class="muted">${a.context||''}</p>
+      <p class="mt"><strong>Language:</strong> ${a.language_detected||'—'} · <strong>Spread Risk:</strong> ${a.spread_risk||'—'} · <strong>Action:</strong> ${a.recommended_action||'—'}</p>
+      <p class="mt">${sources}</p>
+      ${webSourcesBlock}
+      <div class="toolbar mt">
+        <a href="/result/${out.id}" class="btn btn-primary"><i class="fa-solid fa-file-lines"></i> Full Report</a>
+        <a target="_blank" href="https://wa.me/?text=${encodeURIComponent('SachAI verdict: '+a.verdict+' — '+a.summary)}" class="btn btn-outline"><i class="fa-brands fa-whatsapp"></i> Share Verdict</a>
+        <button class="btn btn-outline" onclick="alert('Reported to authorities (demo).')"><i class="fa-solid fa-flag"></i> Report</button>
+      </div>
+    </div>
+  `;
+  arc('arc', a.confidence||50);
+}
+</script>
+{% endblock %}

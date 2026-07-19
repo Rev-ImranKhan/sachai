@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>{% block title %}SachAI — Sach Jaano, Sach Failao{% endblock %}</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Libre+Baskerville:wght@400;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="/static/css/style.css"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<div class="ticker">
+  <div class="ticker-track">
+    <span><i class="fa-solid fa-triangle-exclamation"></i> BREAKING — India ranks #1 globally for WhatsApp misinformation incidents (Stats from MIT Tech Review)</span>
+    <span><i class="fa-solid fa-shield-halved"></i> SachAI verified <strong id="ticker-num">12,486</strong> claims this week</span>
+    <span><i class="fa-solid fa-bolt"></i> 7 out of 10 forwards your relatives send are likely false. Verify before sharing.</span>
+  </div>
+</div>
+
+<nav class="nav">
+  <div class="container nav-inner">
+    <a href="/" class="brand"><i class="fa-solid fa-shield-halved"></i> SachAI</a>
+    <div class="nav-links">
+      <a href="/">Home</a>
+      <a href="/trending">Trending</a>
+      <a href="/community">Community</a>
+      {% if user %}
+        <a href="/dashboard">Dashboard</a>
+        <a href="/fact-check">Fact Check</a>
+        <a href="/history">History</a>
+        <a href="/logout" class="btn btn-outline" style="padding:6px 14px"><i class="fa-solid fa-right-from-bracket"></i> {{ user.name.split(' ')[0] }}</a>
+      {% else %}
+        <a href="/login">Login</a>
+        <a href="/register" class="btn btn-primary" style="padding:8px 16px">Get Started</a>
+      {% endif %}
+    </div>
+  </div>
+</nav>
+
+{% block body %}{% endblock %}
+
+<footer>
+  <div class="container">
+    <p><strong>SachAI</strong> — Built to fight misinformation in India. Verify. Educate. Share responsibly.</p>
+    <p class="muted" style="margin-top:6px">© SachAI 2025. AI-assisted fact-checks are guidance, not legal advice.</p>
+  </div>
+</footer>
+<script src="/static/js/main.js"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

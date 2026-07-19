@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block body %}
+<section class="section container">
+  <h2><i class="fa-solid fa-fire"></i> Trending Misinformation in India</h2>
+  <p class="muted mb">Curated weekly. Last updated this week.</p>
+  <div class="tabs" id="tabs">
+    {% for cat in trending.keys() %}
+      <button class="{% if loop.first %}active{% endif %}" data-cat="{{ cat }}">{{ cat }}</button>
+    {% endfor %}
+  </div>
+
+  {% for cat, items in trending.items() %}
+    <div class="news-grid catwrap" data-cat="{{ cat }}" style="{% if not loop.first %}display:none{% endif %}">
+      {% for it in items %}
+        <div class="news-item">
+          <div class="meta">{{ cat }} · DEBUNKED</div>
+          <h3>{{ it.claim }}</h3>
+          <p class="muted">{{ it.debunk }}</p>
+        </div>
+      {% endfor %}
+    </div>
+  {% endfor %}
+</section>
+<script>
+const tabs = document.getElementById('tabs');
+tabs.addEventListener('click', e=>{
+  const b = e.target.closest('button'); if(!b) return;
+  setActive(tabs,b);
+  document.querySelectorAll('.catwrap').forEach(w=>w.style.display = w.dataset.cat===b.dataset.cat?'':'none');
+});
+</script>
+{% endblock %}

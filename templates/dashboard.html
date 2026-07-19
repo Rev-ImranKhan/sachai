@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block body %}
+<section class="section container">
+  <div class="between mb">
+    <div>
+      <h2 style="margin-bottom:0">Namaste, {{ user.name.split(' ')[0] }} 👋</h2>
+      <p class="muted">Your fact-check command center.</p>
+    </div>
+    <a href="/fact-check" class="btn btn-primary"><i class="fa-solid fa-magnifying-glass"></i> Check New Claim</a>
+  </div>
+
+  <div class="grid grid-3 mb">
+    <div class="card"><div class="meta">Total Checks</div><div style="font-family:'Bebas Neue';font-size:48px;color:var(--primary)">{{ total }}</div></div>
+    <div class="card"><div class="meta">Community Reports</div><div style="font-family:'Bebas Neue';font-size:48px;color:var(--misleading)">{{ community_count }}</div></div>
+    <div class="card"><div class="meta">Account Language</div><div style="font-family:'Bebas Neue';font-size:36px;color:var(--text)">{{ user.language }}</div></div>
+  </div>
+
+  <div class="grid grid-2">
+    <div class="card">
+      <h3>Verdict Breakdown</h3>
+      <div class="donut-wrap"><canvas id="donut"></canvas></div>
+    </div>
+    <div class="card">
+      <h3>Recent Checks</h3>
+      {% if recent %}
+        {% for r in recent %}
+          <div style="padding:10px 0;border-bottom:1px solid var(--border)">
+            <div class="between"><a href="/result/{{ r.id }}" style="color:var(--text);font-weight:600">{{ r.input_text[:80] }}{% if r.input_text|length > 80 %}…{% endif %}</a>
+              <span class="verdict-pill verdict-{{ r.verdict.split(' ')[0] }}">{{ r.verdict }}</span></div>
+            <div class="muted" style="font-size:12px">{{ r.created_at }} · {{ r.input_type }} · {{ r.confidence }}%</div>
+          </div>
+        {% endfor %}
+      {% else %}<p class="muted">No checks yet. <a href="/fact-check">Run your first check →</a></p>{% endif %}
+    </div>
+  </div>
+
+  <div class="card mt">
+    <h3>Trending Misinformation Today</h3>
+    <div class="grid grid-3 mt">
+      {% for cat, items in trending.items() %}
+      <div>
+        <div class="meta">{{ cat }}</div>
+        {% for it in items[:1] %}<p style="margin-top:6px"><strong>{{ it.claim }}</strong><br><span class="muted" style="font-size:13px">{{ it.debunk }}</span></p>{% endfor %}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<script>
+const breakdown = {{ breakdown|tojson }};
+const labels = ['TRUE','FALSE','MISLEADING','PARTIALLY TRUE','UNVERIFIABLE'];
+const colors = ['#059669','#dc2626','#d97706','#0ea5e9','#6b7280'];
+const data = labels.map(l => breakdown[l] || 0);
+new Chart(document.getElementById('donut'),{
+  type:'doughnut',
+  data:{labels,datasets:[{data,backgroundColor:colors,borderColor:'#1f2937',borderWidth:2}]},
+  options:{plugins:{legend:{position:'bottom',labels:{color:'#9ca3af'}}}}
+});
+</script>
+{% endblock %}

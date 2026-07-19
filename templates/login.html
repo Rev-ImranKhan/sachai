@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block body %}
+<div class="auth-wrap">
+  <div class="auth-split">
+    <div class="auth-brand">
+      <div class="mark"><i class="fa-solid fa-shield-halved"></i> SachAI</div>
+      <p>AI-powered fact-checking for Hinglish news, WhatsApp forwards, and viral claims.</p>
+      <ul>
+        <li><i class="fa-solid fa-circle-check"></i> Gemini + Groq verified analysis</li>
+        <li><i class="fa-solid fa-circle-check"></i> Live source search</li>
+        <li><i class="fa-solid fa-circle-check"></i> Hindi and English both</li>
+      </ul>
+    </div>
+    <div class="auth-form-panel">
+      <form method="post" action="/api/login">
+        <h2><i class="fa-solid fa-right-to-bracket"></i> Welcome back</h2>
+        <p class="sub">Sign in to check your next claim</p>
+        {% if error %}<div class="error">{{ error }}</div>{% endif %}
+        <div class="field">
+          <label>Email</label>
+          <div class="input-icon">
+            <i class="fa-solid fa-envelope"></i>
+            <input name="email" type="email" required value="adil@demo.com" autocomplete="email"/>
+          </div>
+        </div>
+        <div class="field">
+          <label>Password</label>
+          <div class="input-icon" style="position:relative">
+            <i class="fa-solid fa-lock"></i>
+            <input id="pw" name="password" type="password" required value="demo123" autocomplete="current-password" style="padding-right:38px"/>
+            <button type="button" class="pw-toggle" onclick="const p=document.getElementById('pw');const i=this.querySelector('i');if(p.type==='password'){p.type='text';i.className='fa-solid fa-eye-slash'}else{p.type='password';i.className='fa-solid fa-eye'}"><i class="fa-solid fa-eye"></i></button>
+          </div>
+        </div>
+        <button class="btn btn-primary btn-block">Sign in</button>
+        <p class="center muted mt">No account? <a href="/register">Create one</a></p>
+        <p class="center muted" style="font-size:12px;margin-top:8px">Demo: adil@demo.com / demo123</p>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

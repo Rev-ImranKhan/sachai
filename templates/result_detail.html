@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block body %}
+<section class="section container">
+  <a href="/history" class="muted">← Back to history</a>
+  <div class="card mt" style="position:relative">
+    <span class="stamp {% if check.verdict=='TRUE' %}verified{% else %}debunked{% endif %}">{{ check.verdict }}</span>
+    <div class="meta">{{ check.input_type|upper }} · {{ check.created_at }}</div>
+    <h2 class="mt">Original Claim</h2>
+    <p style="background:var(--surface);padding:14px;border-radius:6px;border-left:4px solid var(--primary)">{{ check.input_text }}</p>
+
+    <h2 class="mt">Verdict</h2>
+    <span class="verdict-badge verdict-{{ check.verdict.split(' ')[0] }}">{{ check.verdict }}</span>
+    <div class="arc-wrap">
+      <svg id="arc" width="180" height="180" viewBox="0 0 180 180">
+        <circle class="arc-bg" cx="90" cy="90" r="70"/>
+        <circle class="arc-fg" cx="90" cy="90" r="70"/>
+      </svg>
+      <div class="arc-label">{{ check.confidence }}%</div>
+      <div class="arc-sub">Confidence</div>
+    </div>
+
+    <h3>Summary</h3>
+    <p>{{ check.analysis.summary }}</p>
+
+    <h3 class="mt">Step-by-Step Reasoning</h3>
+    <details><summary class="muted" style="cursor:pointer">Expand reasoning ({{ check.analysis.reasoning_steps|length }} steps)</summary>
+      <ol style="padding-left:20px;margin-top:8px">{% for s in check.analysis.reasoning_steps %}<li>{{ s }}</li>{% endfor %}</ol>
+    </details>
+
+    <div class="grid grid-2 mt">
+      <div><h3 style="color:var(--true)">Evidence For</h3>
+        {% for e in check.analysis.evidence_for %}<div class="evidence for">{{ e }}</div>{% endfor %}
+      </div>
+      <div><h3 style="color:var(--false)">Evidence Against</h3>
+        {% for e in check.analysis.evidence_against %}<div class="evidence against">{{ e }}</div>{% endfor %}
+      </div>
+    </div>
+
+    <h3 class="mt">Context</h3><p class="muted">{{ check.analysis.context }}</p>
+    <h3 class="mt">Similar Past Claims (RAG)</h3>
+    {% for s in check.analysis.get('similar', []) %}
+      <div class="evidence"><strong>{{ s.get('verdict','?') }}</strong> — {{ s.get('claim','') }}<br><span class="muted">{{ s.get('explanation','') }}</span></div>
+    {% else %}<p class="muted">No similar entries.</p>{% endfor %}
+
+    <h3 class="mt">Sources Consulted</h3>
+    <p>{% for s in check.analysis.sources_consulted %}<span class="verdict-pill" style="background:var(--surface);color:var(--muted);border:1px solid var(--border);margin-right:6px">{{ s }}</span>{% endfor %}</p>
+
+    {% if check.analysis.web_sources %}
+    <h3 class="mt">Live web sources</h3>
+    <div class="source-list">
+      {% for w in check.analysis.web_sources %}
+      <div class="source-item">
+        <i class="fa-solid fa-link"></i>
+        <a href="{{ w.url }}" target="_blank" rel="noopener">{{ w.title }}</a>
+        <span class="domain">{{ w.domain }}</span>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="toolbar mt">
+      <button class="btn btn-outline" onclick="window.print()"><i class="fa-solid fa-file-pdf"></i> Download PDF</button>
+      <a target="_blank" class="btn btn-primary" href="https://wa.me/?text={{ ('SachAI verdict: ' + check.verdict + ' — ' + check.analysis.summary)|urlencode }}"><i class="fa-brands fa-whatsapp"></i> Share on WhatsApp</a>
+    </div>
+
+    <h3 class="mt">Comments</h3>
+    <div class="evidence"><strong>Ravi K.</strong> — Saved me from forwarding to family group. 🙏</div>
+    <div class="evidence"><strong>Sneha M.</strong> — Useful breakdown, sharing in college WhatsApp.</div>
+  </div>
+</section>
+<script>arc('arc', Number('{{ check.confidence }}'));</script>
+{% endblock %}
