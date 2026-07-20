@@ -9,7 +9,7 @@ import tavily_service
 
 API_KEY = os.getenv("GEMINI_API_KEY", "").strip()
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "").strip()
-MODEL = "gemini-2.5-flash"
+MODEL = "gemini-flash-latest"
 GROQ_MODEL = "llama-3.3-70b-versatile"
 
 _client = None
