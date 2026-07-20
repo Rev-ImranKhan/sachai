@@ -44,6 +44,9 @@ h1,h2,h3,h4{font-family:'Libre Baskerville',serif;font-weight:700;line-height:1.
 .brand i{color:var(--primary)}
 .nav-links{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
 .nav-links a{color:var(--muted);font-weight:500}
+.nav-links a{color:var(--muted);font-weight:500}
+.nav-links a.btn-primary{color:#042C53}
+.nav-links a.btn-primary:hover{color:#fff;text-decoration:none}
 .nav-links a:hover,.nav-links a.active{color:var(--primary);text-decoration:none}
 
 /* hero — signature: faint horizontal "scan lines" like a document under review */
