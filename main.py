@@ -25,6 +25,11 @@ app.mount("/static", StaticFiles(directory=BASE / "static"), name="static")
 templates = Jinja2Templates(directory=BASE / "templates")
 
 init_db()
+try:
+    from seed_facts import seed
+    seed()
+except Exception as e:
+    print(f"[startup] auto-seed skipped: {e}")
 
 TRENDING = {
     "Health": [
